@@ -1,0 +1,8 @@
+{
+  "status": false,
+  "message": "Object data not found.",
+  "data": {
+    "error": "Not found",
+    "code": 404
+  }
+}

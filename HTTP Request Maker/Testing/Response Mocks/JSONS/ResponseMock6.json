@@ -1,0 +1,9 @@
+{
+  "status": true,
+  "message": "Object data loaded.",
+  "data": {
+    "id": 1,
+    "name": "Sample Item",
+    "price": 19.99
+  }
+}
