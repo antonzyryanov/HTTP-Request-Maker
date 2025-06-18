@@ -16,7 +16,8 @@ struct ServerResponseModel: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         status = try container.decode(Bool.self, forKey: .status)
         message = try? container.decode(String?.self, forKey: .message)
-        data = try DataValue(from: decoder)
+        
+        data = try container.decode(DataValue.self, forKey: .data)
     }
 
     enum CodingKeys: String, CodingKey {

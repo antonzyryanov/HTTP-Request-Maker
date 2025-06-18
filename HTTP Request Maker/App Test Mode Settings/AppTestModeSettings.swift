@@ -9,5 +9,5 @@ import Foundation
 
 class AppTestModeSettings {
     var isMockNetworkLayerOn = true
-    var serverResponseDelayTime: Double = 4.0
+    var mockServerResponseDelayTime: Double = 4.0
 }

@@ -16,7 +16,7 @@ class MockHTTPRequestWorker: NSObject, HTTPRequestWorkerProtocol {
         var delayTime: Double = 5.0
         
         if let appTestModeSettings = appTestModeSettings {
-            delayTime = appTestModeSettings.serverResponseDelayTime
+            delayTime = appTestModeSettings.mockServerResponseDelayTime
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
