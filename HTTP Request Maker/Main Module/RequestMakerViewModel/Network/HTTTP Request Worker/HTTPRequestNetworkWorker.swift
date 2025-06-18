@@ -88,7 +88,7 @@ class HTTPRequestNetworkWorker: NSObject, HTTPRequestWorkerProtocol {
 
 extension HTTPRequestNetworkWorker: URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-       let urlCredential = URLCredential(trust: challenge.protectionSpace.serverTrust!)
-       completionHandler(.useCredential, urlCredential)
+        // обработка ошибки валидации защищенного соединения - реализовано игнорирование сертификата
+        completionHandler(Foundation.URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
     }
 }
