@@ -90,7 +90,7 @@ extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
     
     private func handleRequestSuccessEvent(_ serverResponse: (ServerResponsePresentationModel)) {
         self.loaderPresenter?.hideLoader()
-        viewModelsEventsUIHandler?.handleRequestFailureEvent(serverResponse)
+        viewModelsEventsUIHandler?.handleRequestSuccessEvent(serverResponse)
     }
     
     private func handleRequestFailureEvent(_ response: ServerResponsePresentationModel) {

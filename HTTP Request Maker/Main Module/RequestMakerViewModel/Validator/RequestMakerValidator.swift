@@ -27,7 +27,6 @@ class RequestMakerValidator {
         case "String":
             return .success(.String)
         case "JSON-array":
-            // Check if value is a valid JSON array
             if let data = stringData.data(using: .utf8) {
                 do {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] {
@@ -39,7 +38,6 @@ class RequestMakerValidator {
             }
             return .failure("Data type not specified. Possible Types: \'Int\',\'String\',\'JSON-array\',\'JSON-object\'")
         case "JSON-object":
-            // Check if value is a valid JSON object
             if let data = stringData.data(using: .utf8) {
                 do {
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
@@ -51,7 +49,6 @@ class RequestMakerValidator {
             }
             return .failure("Data type not specified. Possible Types: \'Int\',\'String\',\'JSON-array\',\'JSON-object\'")
         default:
-            // Unknown type, consider invalid
             return .failure("Data type not specified. Possible Types: \'Int\',\'String\',\'JSON-array\',\'JSON-object\'")
         }
     }
