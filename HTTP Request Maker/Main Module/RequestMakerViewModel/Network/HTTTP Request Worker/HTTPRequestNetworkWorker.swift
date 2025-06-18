@@ -1,5 +1,5 @@
 //
-//  HTTPRequestWorker.swift
+//  HTTPRequestNetworkWorker.swift
 //  HTTP Request Maker
 //
 //  Created by Anton Zyryanov on 17.06.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class HTTPRequestWorker: NSObject, HTTPRequestWorkerProtocol {
+class HTTPRequestNetworkWorker: NSObject, HTTPRequestWorkerProtocol {
     
     func performRequestWith(model: RequestOutputModelProtocol, completion: @escaping (Result<Data, Error>) -> Void) {
         let scheme = model.isConnectionSecure ? "https" : "http"
@@ -86,7 +86,7 @@ class HTTPRequestWorker: NSObject, HTTPRequestWorkerProtocol {
 }
 
 
-extension HTTPRequestWorker: URLSessionDelegate {
+extension HTTPRequestNetworkWorker: URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
        let urlCredential = URLCredential(trust: challenge.protectionSpace.serverTrust!)
        completionHandler(.useCredential, urlCredential)

@@ -1,5 +1,5 @@
 //
-//  MockHTTPRequestWorker.swift
+//  MockHTTPRequestNetworkWorker.swift
 //  HTTP Request Maker
 //
 //  Created by Anton Zyryanov on 17.06.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MockHTTPRequestWorker: NSObject, HTTPRequestWorkerProtocol {
+class MockHTTPRequestNetworkWorker: NSObject, HTTPRequestWorkerProtocol {
     
     var appTestModeSettings: AppTestModeSettings?
     

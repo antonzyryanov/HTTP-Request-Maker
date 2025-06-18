@@ -21,11 +21,11 @@ class ModulesFactoryImpl: ModulesFactoryProtocol {
         let model = RequestModel(methodType: .GET,serverAdress: "google.com", isConnectionSecure: false, isSecurityValidationOn: false, customHeaders: [:], customData: (.String,""), action: "Action")
         var httpRequestWorker: HTTPRequestWorkerProtocol?
         if appTestModeSettings?.isMockNetworkLayerOn ?? false {
-            let mockHTTPRequestWorker = MockHTTPRequestWorker()
+            let mockHTTPRequestWorker = MockHTTPRequestNetworkWorker()
             mockHTTPRequestWorker.appTestModeSettings = appTestModeSettings
             httpRequestWorker = mockHTTPRequestWorker
         } else {
-            httpRequestWorker = HTTPRequestWorker()
+            httpRequestWorker = HTTPRequestNetworkWorker()
         }
         let viewModel = RequestMakerViewModel(view: view, model: model, worker: httpRequestWorker)
         view.viewModel = viewModel

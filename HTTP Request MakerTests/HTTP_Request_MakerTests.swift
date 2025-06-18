@@ -14,7 +14,7 @@ final class HTTP_Request_MakerTests: XCTestCase {
         let appTestModeSettings = AppTestModeSettings()
         appTestModeSettings.mockRequestCanFail = false
         appTestModeSettings.mockSuccessfullServerResponsesConfiguration = .suitableForTheClient
-        let mockHTTPRequestWorker = MockHTTPRequestWorker()
+        let mockHTTPRequestWorker = MockHTTPRequestNetworkWorker()
         mockHTTPRequestWorker.appTestModeSettings = appTestModeSettings
         let mockModel = RequestOutputModel(methodType: .POST, serverAdress: "google.com", isConnectionSecure: true, isSecurityValidationOn: true, customHeaders: ["Content-Type":"application/json"], action: "Action")
         mockHTTPRequestWorker.performRequestWith(model: mockModel) { result in
