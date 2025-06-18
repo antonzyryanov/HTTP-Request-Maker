@@ -1,5 +1,5 @@
 //
-//  RequestMakerValidator.swift
+//  RequestMakerInputDataValidator.swift
 //  HTTP Request Maker
 //
 //  Created by Anton Zyryanov on 17.06.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class RequestMakerValidator {
+class RequestMakerInputDataValidator {
     func urlValidated(urlString: String?) -> Bool {
         if urlString == nil { return false }
         if let url = urlString, url == "" {

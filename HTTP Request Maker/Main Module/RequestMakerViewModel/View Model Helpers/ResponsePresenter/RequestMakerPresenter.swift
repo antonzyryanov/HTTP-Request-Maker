@@ -1,5 +1,5 @@
 //
-//  RequestMakerPresenter.swift
+//  RequestMakerResponsePresenter.swift
 //  HTTP Request Maker
 //
 //  Created by Anton Zyryanov on 18.06.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class RequestMakerPresenter {
+class RequestMakerResponsePresenter {
     
     weak var view: RequestMakerViewModelToViewProtocol?
     

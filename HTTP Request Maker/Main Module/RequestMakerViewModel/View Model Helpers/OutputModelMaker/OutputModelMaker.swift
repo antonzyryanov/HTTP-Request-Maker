@@ -1,5 +1,5 @@
 //
-//  OutputModelMaker.swift
+//  RequestMakerOutputModelMaker.swift
 //  HTTP Request Maker
 //
 //  Created by Anton Zyryanov on 18.06.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class OutputModelMaker {
+class RequestMakerOutputModelMaker {
     
     func makeOutputModel(model: RequestModelProtocol) -> RequestOutputModelProtocol? {
         switch model.customData.0 {

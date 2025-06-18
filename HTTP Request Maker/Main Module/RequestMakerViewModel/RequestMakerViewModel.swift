@@ -14,15 +14,15 @@ class RequestMakerViewModel {
     private var model: RequestModelProtocol
     
     private var networkWorker: HTTPRequestWorkerProtocol?
-    private var validator = RequestMakerValidator()
-    private let outputModelMaker = OutputModelMaker()
-    private let presenter: RequestMakerPresenter?
+    private var validator = RequestMakerInputDataValidator()
+    private let outputModelMaker = RequestMakerOutputModelMaker()
+    private let presenter: RequestMakerResponsePresenter?
     
     init(view: RequestMakerViewModelToViewProtocol, model: RequestModelProtocol, worker: HTTPRequestWorkerProtocol?) {
         self.view = view
         self.model = model
         self.networkWorker = worker
-        self.presenter = RequestMakerPresenter(view: view)
+        self.presenter = RequestMakerResponsePresenter(view: view)
     }
     
 }
