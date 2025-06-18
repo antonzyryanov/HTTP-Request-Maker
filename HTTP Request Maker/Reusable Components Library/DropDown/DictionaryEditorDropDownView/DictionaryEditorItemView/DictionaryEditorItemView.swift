@@ -18,6 +18,13 @@ class DictionaryEditorItemView: UIView {
     
     func configureWith(model: DictionaryEditorItemModel) {
         self.backgroundColor = .white
+        setupTextsFrom(model)
+        setupHorizontalStack()
+        setup(textView:keyTextView)
+        setup(textView:valueTextView)
+    }
+    
+    private func setupTextsFrom(_ model: DictionaryEditorItemModel) {
         switch model {
         case .empty:
             keyTextView.text = ""
@@ -32,6 +39,9 @@ class DictionaryEditorItemView: UIView {
                 valueTextView.isUserInteractionEnabled = false
             }
         }
+    }
+    
+    private func setupHorizontalStack() {
         self.addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints { make in
             make.bottom.top.equalToSuperview()
@@ -41,18 +51,15 @@ class DictionaryEditorItemView: UIView {
         horizontalStack.spacing = 12
         horizontalStack.addArrangedSubview(keyTextView)
         horizontalStack.addArrangedSubview(valueTextView)
-        keyTextView.snp.makeConstraints { make in
+    }
+    
+    private func setup(textView: UITextView) {
+        textView.snp.makeConstraints { make in
             make.height.equalTo(64)
             make.width.equalTo(UIScreen.main.bounds.width/2 - 54)
         }
-        valueTextView.snp.makeConstraints { make in
-            make.height.equalTo(64)
-            make.width.equalTo(UIScreen.main.bounds.width/2 - 54)
-        }
-        keyTextView.backgroundColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
-        valueTextView.backgroundColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
-        keyTextView.textStorage.delegate = self
-        valueTextView.textStorage.delegate = self
+        textView.backgroundColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+        textView.textStorage.delegate = self
     }
     
 }

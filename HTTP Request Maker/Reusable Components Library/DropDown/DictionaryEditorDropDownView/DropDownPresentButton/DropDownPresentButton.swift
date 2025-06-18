@@ -29,12 +29,23 @@ class DropDownPresentButton: UIView, DropDownPresentButtonProtocol {
     
     func configureWith(model: DropDownPresentButtonModel) {
         self.model = model
+        setupLabel(model: model)
+        setupImage()
+    }
+    
+    private func setupLabel(model: DropDownPresentButtonModel) {
         self.addSubview(label)
         label.snp.makeConstraints { make in
             make.height.equalTo(64)
             make.leading.equalToSuperview().inset(16)
             make.top.equalToSuperview()
         }
+        label.text = model.presentTitle
+        label.textColor = .black
+        label.font = .systemFont(ofSize: 24, weight: .bold)
+    }
+    
+    private func setupImage() {
         self.addSubview(arrowImageView)
         arrowImageView.snp.makeConstraints { make in
             make.width.equalTo(24)
@@ -43,9 +54,6 @@ class DropDownPresentButton: UIView, DropDownPresentButtonProtocol {
             make.centerY.equalToSuperview()
         }
         arrowImageView.image = UIImage(named: "arrow_down")
-        label.text = model.presentTitle
-        label.textColor = .black
-        label.font = .systemFont(ofSize: 24, weight: .bold)
     }
 
 }

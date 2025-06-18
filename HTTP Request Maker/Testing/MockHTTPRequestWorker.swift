@@ -92,8 +92,6 @@ class MockHTTPRequestWorker: NSObject, HTTPRequestWorkerProtocol {
                 print(error.localizedDescription)
             }
             
-        } else {
-            
         }
     }
     

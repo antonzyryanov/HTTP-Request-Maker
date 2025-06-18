@@ -9,35 +9,16 @@ import Foundation
 import UIKit
 
 class RequestMakerVCUIBuilder {
-    
+
     private weak var viewController: RequestMakerViewController!
-    private weak var scrollView: UIScrollView!
-    private weak var verticalStack: UIStackView!
-    private weak var serverAddressTextField: UITextField!
-    private weak var secureConnectionSwitch: CustomSwitch!
-    private weak var secureConnectionValidationSwitch: CustomSwitch!
-    private weak var httpMethodPicker: UIPickerView!
-    private weak var customHTTPHeadersDropDown: DictionaryEditorDropDownView!
-    private weak var customHTTPBodyDropDown: DictionaryEditorDropDownView!
-    private weak var serverResponseLabel: TopAlignedLabel!
-    private weak var responseStatusLabel: TopAlignedLabel!
-    private weak var responseErrorLabel: TopAlignedLabel!
-    private weak var responseLabel: TopAlignedLabel!
+    private weak var viewsContainer: RequestMakerViewsContainer!
     
-    init(viewController: RequestMakerViewController!, scrollView: UIScrollView!, verticalStack: UIStackView!, serverAddressTextField: UITextField!, secureConnectionSwitch: CustomSwitch!, secureConnectionValidationSwitch: CustomSwitch!, httpMethodPicker: UIPickerView!, customHTTPHeadersDropDown: DictionaryEditorDropDownView!, customHTTPBodyDropDown: DictionaryEditorDropDownView!, serverResponseLabel: TopAlignedLabel!, responseStatusLabel: TopAlignedLabel!, responseErrorLabel: TopAlignedLabel!, responseLabel: TopAlignedLabel!) {
+    private let commonElementsHeight: CGFloat = 64
+    private let commonElementsHorizontalInsets: CGFloat = 32
+    
+    init(viewController: RequestMakerViewController!, viewsContainer: RequestMakerViewsContainer!) {
         self.viewController = viewController
-        self.scrollView = scrollView
-        self.verticalStack = verticalStack
-        self.serverAddressTextField = serverAddressTextField
-        self.secureConnectionSwitch = secureConnectionSwitch
-        self.secureConnectionValidationSwitch = secureConnectionValidationSwitch
-        self.httpMethodPicker = httpMethodPicker
-        self.customHTTPHeadersDropDown = customHTTPHeadersDropDown
-        self.customHTTPBodyDropDown = customHTTPBodyDropDown
-        self.serverResponseLabel = serverResponseLabel
-        self.responseStatusLabel = responseStatusLabel
-        self.responseErrorLabel = responseErrorLabel
-        self.responseLabel = responseLabel
+        self.viewsContainer = viewsContainer
     }
     
     func build() {
@@ -45,98 +26,82 @@ class RequestMakerVCUIBuilder {
         setupVerticalStack()
         addSpacerWith(height: 164)
         setupServerAddressTextField()
-        setupSecureConnectionSwitch()
-        setupSecureConnectionValidationSwitch()
+        setupCustomSwitches()
         setupHTTPMethodPicker()
-        setupCustomHTTPHeadersDropDown()
-        setupCustomHTTPBodyDropDown()
+        setupDropDowns()
         setupDivider()
-        setupServerResponseLabel()
-        setupResponseStatusLabel()
-        setupResponseErrorLabel()
-        setupResponseLabel()
-        let tap = UITapGestureRecognizer(target: viewController, action: #selector(viewController.dismissKeyboard))
-        viewController.view.addGestureRecognizer(tap)
-    }
-    
-    private func addToVStack(subview: UIView, with height: CGFloat, and width: CGFloat) {
-        verticalStack.addArrangedSubview(subview)
-        subview.snp.makeConstraints { make in
-            make.height.equalTo(height)
-            make.width.equalTo(width)
-        }
+        setupLabels()
+        setupKeyboardGesture()
     }
     
     private func setupScrollView() {
-        viewController.view.addSubview(scrollView)
-        scrollView.delegate = viewController
-        scrollView.snp.makeConstraints { make in
+        viewController.view.addSubview(viewsContainer.scrollView)
+        viewsContainer.scrollView.delegate = viewController
+        viewsContainer.scrollView.snp.makeConstraints { make in
             make.edges.equalTo(viewController.view)
         }
     }
     
     private func setupVerticalStack() {
-        scrollView.addSubview(verticalStack)
-        verticalStack.axis = .vertical
-        verticalStack.snp.makeConstraints { make in
+        viewsContainer.scrollView.addSubview(viewsContainer.verticalStack)
+        viewsContainer.verticalStack.axis = .vertical
+        viewsContainer.verticalStack.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(16)
             make.trailing.equalToSuperview().inset(16)
             make.top.bottom.equalToSuperview()
             make.width.equalTo(UIScreen.main.bounds.width-32)
         }
-        verticalStack.spacing = 16
+        viewsContainer.verticalStack.spacing = 16
     }
     
     private func addSpacerWith(height: CGFloat) {
         let spacer = UIView(frame: .init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: height))
         spacer.backgroundColor = .clear
-        addToVStack(subview:spacer,with: height,and: UIScreen.main.bounds.width-64)
+        addToVStack(subview:spacer,with: height,and: UIScreen.main.bounds.width-commonElementsHorizontalInsets*2)
     }
     
     private func setupServerAddressTextField() {
-        serverAddressTextField.backgroundColor = .white
-        serverAddressTextField.font = .systemFont(ofSize: 24, weight: .bold)
-        serverAddressTextField.placeholder = "Paste server address"
-        serverAddressTextField.text = "google.com"
-        addToVStack(subview:serverAddressTextField,with: 64,and: UIScreen.main.bounds.width-64)
-        let divider = UIView(frame: .init(x: 0, y: 0, width: 16, height: 64))
-        serverAddressTextField.leftView = divider
-        serverAddressTextField.leftViewMode = .always
-        serverAddressTextField.layer.cornerRadius = 16
-        serverAddressTextField.clipsToBounds = true
-        serverAddressTextField.autocapitalizationType = .none
-        serverAddressTextField.addTarget(viewController, action: #selector(viewController.textFieldDidChange(_:)), for: .editingChanged)
+        viewsContainer.serverAddressTextField.backgroundColor = .white
+        viewsContainer.serverAddressTextField.font = .systemFont(ofSize: 24, weight: .bold)
+        viewsContainer.serverAddressTextField.placeholder = "Paste server address"
+        viewsContainer.serverAddressTextField.text = "google.com"
+        addToVStack(subview:viewsContainer.serverAddressTextField,with: commonElementsHeight,and: UIScreen.main.bounds.width-commonElementsHorizontalInsets*2)
+        let divider = UIView(frame: .init(x: 0, y: 0, width: 16, height: commonElementsHeight))
+        viewsContainer.serverAddressTextField.leftView = divider
+        viewsContainer.serverAddressTextField.leftViewMode = .always
+        viewsContainer.serverAddressTextField.layer.cornerRadius = 16
+        viewsContainer.serverAddressTextField.clipsToBounds = true
+        viewsContainer.serverAddressTextField.autocapitalizationType = .none
+        viewsContainer.serverAddressTextField.addTarget(viewController, action: #selector(viewController.textFieldDidChange(_:)), for: .editingChanged)
+    }
+    
+    private func setupCustomSwitches() {
+        setupSecureConnectionSwitch()
+        setupSecureConnectionValidationSwitch()
     }
     
     private func setupSecureConnectionSwitch() {
-        secureConnectionSwitch.configureWith(title: "Secure connection", andChangedOption: .isConnectionSecure)
-        secureConnectionSwitch.delegate = viewController
-        addToVStack(subview:secureConnectionSwitch,with: 64,and: UIScreen.main.bounds.width-64)
+        viewsContainer.secureConnectionSwitch.configureWith(title: "Secure connection", andChangedOption: .isConnectionSecure)
+        viewsContainer.secureConnectionSwitch.delegate = viewController
+        addToVStack(subview:viewsContainer.secureConnectionSwitch,with: commonElementsHeight,and: UIScreen.main.bounds.width-commonElementsHorizontalInsets*2)
     }
     
     private func setupSecureConnectionValidationSwitch() {
-        secureConnectionValidationSwitch.configureWith(title: "Secure connection validation", andChangedOption: .isSecurityValidationOn)
-        secureConnectionValidationSwitch.delegate = viewController
-        addToVStack(subview:secureConnectionValidationSwitch,with: 64,and: UIScreen.main.bounds.width-64)
-    }
-    
-    private func setupCustomHTTPHeadersDropDown() {
-        verticalStack.addArrangedSubview(customHTTPHeadersDropDown)
-        customHTTPHeadersDropDown.configureWith(model: DictionaryEditorModel(presentButtonModel: .init(presentTitle: "HTTP headers", hideTitle: "HTTP headers"),existingDictionary: ["Content-Type":"application/json"], numberOfNewElementsToAdd: 14, presentButtonHeight: 64, itemsHeight: 64, dictType: .httpHeaders))
-        customHTTPHeadersDropDown.delegate = viewController
-    }
-    
-    private func setupCustomHTTPBodyDropDown() {
-        verticalStack.addArrangedSubview(customHTTPBodyDropDown)
-        customHTTPBodyDropDown.configureWith(model: DictionaryEditorModel(presentButtonModel: .init(presentTitle: "HTTP body", hideTitle: "HTTP body"), existingDictionary: ["data type":"","data":""], numberOfNewElementsToAdd: 0, presentButtonHeight: 64, itemsHeight: 300, dictType: .httpData))
-        customHTTPBodyDropDown.delegate = viewController
+        viewsContainer.secureConnectionValidationSwitch.configureWith(title: "Secure connection validation", andChangedOption: .isSecurityValidationOn)
+        viewsContainer.secureConnectionValidationSwitch.delegate = viewController
+        addToVStack(subview:viewsContainer.secureConnectionValidationSwitch,with: commonElementsHeight,and: UIScreen.main.bounds.width-commonElementsHorizontalInsets*2)
     }
     
     private func setupHTTPMethodPicker() {
-        verticalStack.addArrangedSubview(httpMethodPicker)
-        addToVStack(subview:httpMethodPicker,with: 64,and: UIScreen.main.bounds.width)
-        httpMethodPicker.delegate = viewController
-        httpMethodPicker.dataSource = viewController
+        viewsContainer.verticalStack.addArrangedSubview(viewsContainer.httpMethodPicker)
+        addToVStack(subview:viewsContainer.httpMethodPicker,with: commonElementsHeight,and: UIScreen.main.bounds.width)
+        viewsContainer.httpMethodPicker.delegate = viewController
+        viewsContainer.httpMethodPicker.dataSource = viewController
+    }
+    
+    private func setupDropDowns() {
+        setupCustomHTTPHeadersDropDown()
+        setupCustomHTTPBodyDropDown()
     }
     
     private func setupDivider() {
@@ -145,30 +110,62 @@ class RequestMakerVCUIBuilder {
         addToVStack(subview: divider,with: 2,and: UIScreen.main.bounds.width)
     }
     
+    private func setupCustomHTTPHeadersDropDown() {
+        viewsContainer.verticalStack.addArrangedSubview(viewsContainer.customHTTPHeadersDropDown)
+        viewsContainer.customHTTPHeadersDropDown.configureWith(model: DictionaryEditorModel(presentButtonModel: .init(presentTitle: "HTTP headers", hideTitle: "HTTP headers"),existingDictionary: ["Content-Type":"application/json"], numberOfNewElementsToAdd: 14, presentButtonHeight: commonElementsHeight, itemsHeight: commonElementsHeight, dictType: .httpHeaders))
+        viewsContainer.customHTTPHeadersDropDown.delegate = viewController
+    }
+    
+    private func setupCustomHTTPBodyDropDown() {
+        viewsContainer.verticalStack.addArrangedSubview(viewsContainer.customHTTPBodyDropDown)
+        viewsContainer.customHTTPBodyDropDown.configureWith(model: DictionaryEditorModel(presentButtonModel: .init(presentTitle: "HTTP body", hideTitle: "HTTP body"), existingDictionary: ["data type":"","data":""], numberOfNewElementsToAdd: 0, presentButtonHeight: commonElementsHeight, itemsHeight: 300, dictType: .httpData))
+        viewsContainer.customHTTPBodyDropDown.delegate = viewController
+    }
+    
+    private func setupLabels() {
+        setupServerResponseLabel()
+        setupResponseStatusLabel()
+        setupResponseErrorLabel()
+        setupResponseLabel()
+    }
+    
     private func setupServerResponseLabel() {
-        addToVStack(subview:serverResponseLabel,with: 64,and: UIScreen.main.bounds.width)
-        serverResponseLabel.font = .systemFont(ofSize: 24, weight: .bold)
-        serverResponseLabel.text = "Server response:"
+        addToVStack(subview:viewsContainer.serverResponseLabel,with: commonElementsHeight,and: UIScreen.main.bounds.width)
+        viewsContainer.serverResponseLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        viewsContainer.serverResponseLabel.text = "Server response:"
     }
     
     private func setupResponseStatusLabel() {
-        addToVStack(subview:responseStatusLabel,with: 64,and: UIScreen.main.bounds.width)
-        responseStatusLabel.font = .systemFont(ofSize: 24, weight: .bold)
-        responseStatusLabel.text = "Status:"
+        addToVStack(subview:viewsContainer.responseStatusLabel,with: commonElementsHeight,and: UIScreen.main.bounds.width)
+        viewsContainer.responseStatusLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        viewsContainer.responseStatusLabel.text = "Status:"
     }
     
     private func setupResponseErrorLabel() {
-        addToVStack(subview:responseErrorLabel,with: 128,and: UIScreen.main.bounds.width)
-        responseErrorLabel.font = .systemFont(ofSize: 24, weight: .bold)
-        responseErrorLabel.text = "Error: -"
-        responseErrorLabel.numberOfLines = 4
+        addToVStack(subview:viewsContainer.responseErrorLabel,with: 128,and: UIScreen.main.bounds.width)
+        viewsContainer.responseErrorLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        viewsContainer.responseErrorLabel.text = "Error: -"
+        viewsContainer.responseErrorLabel.numberOfLines = 4
     }
     
     private func setupResponseLabel() {
-        addToVStack(subview:responseLabel,with: 280,and: UIScreen.main.bounds.width)
-        responseLabel.font = .systemFont(ofSize: 24, weight: .bold)
-        responseLabel.text = "Response:"
-        responseLabel.numberOfLines = 6
+        addToVStack(subview:viewsContainer.responseLabel,with: 280,and: UIScreen.main.bounds.width)
+        viewsContainer.responseLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        viewsContainer.responseLabel.text = "Response:"
+        viewsContainer.responseLabel.numberOfLines = 6
+    }
+    
+    private func setupKeyboardGesture() {
+        let tap = UITapGestureRecognizer(target: viewController, action: #selector(viewController.dismissKeyboard))
+        viewController.view.addGestureRecognizer(tap)
+    }
+    
+    private func addToVStack(subview: UIView, with height: CGFloat, and width: CGFloat) {
+        viewsContainer.verticalStack.addArrangedSubview(subview)
+        subview.snp.makeConstraints { make in
+            make.height.equalTo(height)
+            make.width.equalTo(width)
+        }
     }
     
 }

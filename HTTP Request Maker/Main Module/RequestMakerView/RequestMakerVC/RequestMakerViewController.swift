@@ -12,21 +12,10 @@ class RequestMakerViewController: VCWithCustomTabBar {
     
     var viewModel: RequestMakerViewToViewModelProtocol?
     
-    private let scrollView = UIScrollView()
-    private let verticalStack = UIStackView()
-    private let serverAddressTextField = UITextField()
-    private let secureConnectionSwitch = CustomSwitch()
-    private let secureConnectionValidationSwitch = CustomSwitch()
-    private let httpMethodPicker = UIPickerView()
-    private let customHTTPHeadersDropDown = DictionaryEditorDropDownView()
-    private let customHTTPBodyDropDown = DictionaryEditorDropDownView()
-    private let serverResponseLabel = TopAlignedLabel()
-    private let responseStatusLabel = TopAlignedLabel()
-    private let responseErrorLabel = TopAlignedLabel()
-    private let responseLabel = TopAlignedLabel()
-    private let loaderView = LoaderView()
+    private let viewsContainer = RequestMakerViewsContainer()
     
     private var uiBuilder: RequestMakerVCUIBuilder?
+    private var loaderPresenter: LoaderPresenter?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,11 +27,15 @@ class RequestMakerViewController: VCWithCustomTabBar {
         uiBuilder?.build()
         super.viewWillAppear(animated)
         setupTabBar()
-        setupLoaderView()
+        createLoaderPresenter()
     }
     
     private func createBuilder() {
-        uiBuilder = RequestMakerVCUIBuilder(viewController: self, scrollView: self.scrollView, verticalStack: self.verticalStack, serverAddressTextField: self.serverAddressTextField, secureConnectionSwitch: self.secureConnectionSwitch, secureConnectionValidationSwitch: self.secureConnectionValidationSwitch, httpMethodPicker: self.httpMethodPicker, customHTTPHeadersDropDown: self.customHTTPHeadersDropDown, customHTTPBodyDropDown: self.customHTTPBodyDropDown, serverResponseLabel: self.serverResponseLabel, responseStatusLabel: self.responseStatusLabel, responseErrorLabel: self.responseErrorLabel, responseLabel: self.responseLabel)
+        uiBuilder = RequestMakerVCUIBuilder(viewController: self, viewsContainer: viewsContainer)
+    }
+    
+    private func createLoaderPresenter() {
+        loaderPresenter = LoaderPresenter(viewController: self)
     }
     
     private func setupTabBar() {
@@ -69,92 +62,76 @@ class RequestMakerViewController: VCWithCustomTabBar {
         view.endEditing(true)
     }
     
-    private func setupLoaderView() {
-        self.view.addSubview(loaderView)
-        loaderView.snp.makeConstraints { make in
-            make.leading.trailing.top.bottom.equalToSuperview()
-            make.width.height.equalToSuperview()
-        }
-//        loaderView.frame = .init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-//        loaderView.configureWith(gif: "loader")
-        loaderView.backgroundColor = .white
-        loaderView.configureWith(gif: "loader")
-        loaderView.isHidden = true
-    }
-    
-    private func showLoader() {
-        DispatchQueue.main.async {
-            self.loaderView.isHidden = false
-            self.view.isUserInteractionEnabled = false
-            self.view.layoutSubviews()
-        }
-    }
-    
-    private func hideLoader() {
-        DispatchQueue.main.async {
-            self.loaderView.isHidden = true
-            self.view.isUserInteractionEnabled = true
-            self.view.layoutSubviews()
-        }
-    }
-    
 }
 
 extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
     private func validationSucceded() {
-        self.responseErrorLabel.text = "Error: -"
-        self.responseErrorLabel.textColor = .black
-        self.serverAddressTextField.textColor = .black
+        self.viewsContainer.responseErrorLabel.text = "Error: -"
+        self.viewsContainer.responseErrorLabel.textColor = .black
+        self.viewsContainer.serverAddressTextField.textColor = .black
     }
     
     func process(event: RequestMakerViewModelEvent) {
         switch event {
         case .makingRequest:
-            self.showLoader()
+            self.loaderPresenter?.showLoader()
         case .requestSuccessed(let serverResponse):
-            self.hideLoader()
-            self.responseErrorLabel.text = "Message: \(serverResponse.message)"
-            self.responseStatusLabel.text = "Status: \(serverResponse.status)"
-            self.responseLabel.text = "Response:\n\(serverResponse.responseData)"
-            self.serverResponseLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
-            self.responseLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
-            self.responseErrorLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
-            self.responseStatusLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.serverResponseLabel.textColor = .black
-                self.responseLabel.textColor = .black
-                self.responseErrorLabel.textColor = .black
-                self.responseStatusLabel.textColor = .black
-            }
+            handleRequestSuccessEvent(serverResponse)
         case .requestFailed(let error):
-            self.hideLoader()
-            self.responseErrorLabel.text = "Error: \(error)"
-            self.responseStatusLabel.text = "Status: "
-            self.serverResponseLabel.textColor = .red
-            self.responseLabel.textColor = .red
-            self.responseErrorLabel.textColor = .red
-            self.responseStatusLabel.textColor = .red
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.serverResponseLabel.textColor = .black
-                self.responseLabel.textColor = .black
-                self.responseErrorLabel.textColor = .black
-                self.responseStatusLabel.textColor = .black
-            }
+            handleRequestFailureEvent(error)
         case .adressValidationFailed:
-            self.hideLoader()
-            self.responseErrorLabel.text = "Error: Validation Error\nWrong server adress format"
-            self.responseErrorLabel.textColor = .red
-            self.serverAddressTextField.textColor = .red
+            handleAddressValidationFailureEvent()
         case .adressValidationSucceded:
             self.validationSucceded()
         case .dataValidationFailed(let error):
-            self.hideLoader()
-            self.responseErrorLabel.text = "Error: \(error)"
-            self.responseErrorLabel.textColor = .red
+            self.loaderPresenter?.hideLoader()
+            self.viewsContainer.responseErrorLabel.text = "Error: \(error)"
+            self.viewsContainer.responseErrorLabel.textColor = .red
         case .dataValidationSucceded:
             self.validationSucceded()
         }
     }
+    
+    private func handleRequestSuccessEvent(_ serverResponse: (ServerResponsePresentationModel)) {
+        self.loaderPresenter?.hideLoader()
+        self.viewsContainer.responseErrorLabel.text = "Message: \(serverResponse.message)"
+        self.viewsContainer.responseStatusLabel.text = "Status: \(serverResponse.status)"
+        self.viewsContainer.responseLabel.text = "Response:\n\(serverResponse.responseData)"
+        self.viewsContainer.serverResponseLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+        self.viewsContainer.responseLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+        self.viewsContainer.responseErrorLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+        self.viewsContainer.responseStatusLabel.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.viewsContainer.serverResponseLabel.textColor = .black
+            self.viewsContainer.responseLabel.textColor = .black
+            self.viewsContainer.responseErrorLabel.textColor = .black
+            self.viewsContainer.responseStatusLabel.textColor = .black
+        }
+    }
+    
+    private func handleRequestFailureEvent(_ error: (String)) {
+        self.loaderPresenter?.hideLoader()
+        self.viewsContainer.responseErrorLabel.text = "Error: \(error)"
+        self.viewsContainer.responseStatusLabel.text = "Status: "
+        self.viewsContainer.serverResponseLabel.textColor = .red
+        self.viewsContainer.responseLabel.textColor = .red
+        self.viewsContainer.responseErrorLabel.textColor = .red
+        self.viewsContainer.responseStatusLabel.textColor = .red
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.viewsContainer.serverResponseLabel.textColor = .black
+            self.viewsContainer.responseLabel.textColor = .black
+            self.viewsContainer.responseErrorLabel.textColor = .black
+            self.viewsContainer.responseStatusLabel.textColor = .black
+        }
+    }
+    
+    fileprivate func handleAddressValidationFailureEvent() {
+        self.loaderPresenter?.hideLoader()
+        self.viewsContainer.responseErrorLabel.text = "Error: Validation Error\nWrong server adress format"
+        self.viewsContainer.responseErrorLabel.textColor = .red
+        self.viewsContainer.serverAddressTextField.textColor = .red
+    }
+    
 }
 
 extension RequestMakerViewController: CustomSwitchDelegate {

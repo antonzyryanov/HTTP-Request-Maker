@@ -48,6 +48,14 @@ class DictionaryEditorDropDownView: UIView, DropDownProtocol {
     private func setupView(dictionaryEditorItems: [DictionaryEditorItemModel]) {
         guard let model = model else { return }
         self.addSubview(vStack)
+        setupVStack()
+        setupPresentButton()
+        setupDictionaryItems(dictionaryEditorItems, model)
+        setupBottomSpacer()
+        closeDropDown()
+    }
+    
+    private func setupVStack() {
         vStack.snp.makeConstraints { make in
             make.leading.top.trailing.bottom.equalToSuperview()
         }
@@ -57,12 +65,19 @@ class DictionaryEditorDropDownView: UIView, DropDownProtocol {
         vStack.axis = .vertical
         vStack.spacing = 8
         vStack.addArrangedSubview(presentButton)
+    }
+    
+    private func setupPresentButton() {
+        guard let model = model else { return }
         presentButton.snp.makeConstraints { make in
             make.height.equalTo(model.presentButtonHeight)
             make.width.equalToSuperview()
         }
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.presentButtonTapped))
         presentButton.addGestureRecognizer(tap)
+    }
+    
+    private func setupDictionaryItems(_ dictionaryEditorItems: [DictionaryEditorItemModel], _ model: DictionaryEditorModel) {
         for (index, dictItem) in dictionaryEditorItems.enumerated() {
             let dictItemView = DictionaryEditorItemView()
             vStack.addArrangedSubview(dictItemView)
@@ -76,21 +91,13 @@ class DictionaryEditorDropDownView: UIView, DropDownProtocol {
             dictionaryEditorItemsViews.append(dictItemView)
             let vm = DictionaryEditorItemViewModel(view: dictItemView, model: dictItem)
         }
-        
+    }
+    
+    private func setupBottomSpacer() {
         vStack.addArrangedSubview(vStackBottomSpacer)
         vStackBottomSpacer.snp.makeConstraints { make in
             make.height.equalTo(32)
             make.width.equalToSuperview()
-        }
-        closeDropDown()
-    }
-    
-    private func closeDropDown() {
-        UIView.animate(withDuration: 0.3) { [self] in
-            for view in self.dictionaryEditorItemsViews {
-                view.isHidden = true
-                vStackBottomSpacer.isHidden = true
-            }
         }
     }
     
@@ -99,6 +106,15 @@ class DictionaryEditorDropDownView: UIView, DropDownProtocol {
             for view in dictionaryEditorItemsViews {
                 view.isHidden = false
                 vStackBottomSpacer.isHidden = false
+            }
+        }
+    }
+    
+    private func closeDropDown() {
+        UIView.animate(withDuration: 0.3) { [self] in
+            for view in self.dictionaryEditorItemsViews {
+                view.isHidden = true
+                vStackBottomSpacer.isHidden = true
             }
         }
     }

@@ -16,6 +16,8 @@ class CustomTabBarButton: UIView {
     var tapAction: (()->Void)?
     var navigateToScreen: ((String)->Void)? = nil
     
+    private let highlightColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+    
     init() {
         super.init(frame: .zero)
     }
@@ -28,8 +30,7 @@ class CustomTabBarButton: UIView {
         setupBackgroundView()
         setup(image: model.image)
         setup(title: model.title)
-        self.tapAction = model.action
-        setupTapGesture()
+        setupActions(model: model)
     }
     
     private func setup(title: String) {
@@ -69,20 +70,20 @@ class CustomTabBarButton: UIView {
         }
     }
     
-    private func setupTapGesture() {
+    private func setupActions(model:CustomTabBarButtonModel) {
+        self.tapAction = model.action
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.buttonTapAction))
         self.addGestureRecognizer(tap)
     }
     
     private func playTapAnimations() {
         guard let backgroundImage = imageView else { return }
-        backgroundImage.tintColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
-        self.titleLabel?.textColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+        backgroundImage.tintColor = highlightColor
+        self.titleLabel?.textColor = highlightColor
         UIView.animate(withDuration: 0.2) {
             backgroundImage.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
             self.titleLabel?.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
         } completion: { _ in
-            
             UIView.animate(withDuration: 0.1) {
                 backgroundImage.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
                 self.titleLabel?.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
@@ -91,7 +92,6 @@ class CustomTabBarButton: UIView {
                 self.titleLabel?.textColor = UIColor.black
             }
         }
-
     }
     
     @objc func buttonTapAction() {

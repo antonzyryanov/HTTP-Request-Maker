@@ -16,6 +16,11 @@ class VCWithCustomTabBar: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        setupBackgroundImage()
+        setupTabBar()
+    }
+    
+    private func setupBackgroundImage() {
         let backgroundImage = UIImage(named: "stars_background")
         let backgroundImageView = UIImageView(image: backgroundImage)
         self.view.addSubview(backgroundImageView)
@@ -24,6 +29,9 @@ class VCWithCustomTabBar: UIViewController {
             make.top.equalToSuperview().inset(64)
         }
         backgroundImageView.clipsToBounds = true
+    }
+    
+    private func setupTabBar() {
         self.view.addSubview(tabBar)
         tabBar.snp.makeConstraints { make in
             make.height.equalTo(150)

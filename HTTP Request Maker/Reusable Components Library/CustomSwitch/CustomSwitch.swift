@@ -14,6 +14,8 @@ class CustomSwitch: UIView {
     var delegate: CustomSwitchDelegate?
     var changedOption: CustomSwitchOption = .isConnectionSecure
     
+    private let switchColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+    
     private var isOn: Bool = false
     
     init() {
@@ -44,7 +46,7 @@ class CustomSwitch: UIView {
             make.top.equalToSuperview()
             make.trailing.equalToSuperview().inset(16)
         }
-        switchView.onTintColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
+        switchView.onTintColor = switchColor
         switchView.addTarget(self, action: #selector(onSwitchValueChanged), for: .valueChanged)
     }
     

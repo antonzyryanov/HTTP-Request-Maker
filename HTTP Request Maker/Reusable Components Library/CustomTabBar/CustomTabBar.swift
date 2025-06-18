@@ -24,6 +24,16 @@ class CustomTabBar: UIView {
     func customizeWith(configuration: CustomTabBarConfiguration) {
         let stackView = UIStackView()
         stackView.axis = .horizontal
+        setupButtons(configuration, stackView)
+        self.addSubview(stackView)
+        stackView.snp.makeConstraints { make in
+            make.leading.trailing.top.equalToSuperview()
+            make.height.equalTo(150)
+        }
+        stylize(stackView, configuration)
+    }
+    
+    private func setupButtons(_ configuration: CustomTabBarConfiguration, _ stackView: UIStackView) {
         for buttonModel in configuration.buttons {
             let buttonView = CustomTabBarButton()
             buttonView.setupWith(model: buttonModel)
@@ -38,11 +48,9 @@ class CustomTabBar: UIView {
             stackView.addArrangedSubview(buttonView)
         }
         stackView.distribution = .fillEqually
-        self.addSubview(stackView)
-        stackView.snp.makeConstraints { make in
-            make.leading.trailing.top.equalToSuperview()
-            make.height.equalTo(150)
-        }
+    }
+    
+    private func stylize(_ stackView: UIStackView, _ configuration: CustomTabBarConfiguration) {
         stackView.backgroundColor = configuration.backgroundColor
         stackView.layer.cornerRadius = configuration.cornerRadius
         stackView.layer.borderWidth = configuration.borderWidth
