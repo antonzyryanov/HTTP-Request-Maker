@@ -47,14 +47,12 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
             guard dict.count > 1
             else { return }
             processHTTPDataChange(dict)
-
-            
         }
     }
     
     private func processChangeOf(_ adress: (String)) {
+        model.serverAdress = adress
         if validator.urlValidated(urlString: adress) {
-            model.serverAdress = adress
             view.process(event: .adressValidationSucceded)
         } else {
             view.process(event: .adressValidationFailed)
@@ -62,8 +60,6 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
     }
     
     private func processHTTPDataChange(_ dict: ([String : String])) {
-        let dataContainer = dict["data"]
-        let dataTypeContainer = dict["data type"]
         let validationResult = validator.validate(dict["data"] ?? "", as: dict["data type"] ?? "")
         switch validationResult {
         case .success(let dataType):
@@ -81,12 +77,13 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
             let validationResult = validator.validate(model.customData.1, as: model.customData.0.rawValue)
             switch validationResult {
             case .success(let dataType):
-                guard let outputModel = outputModelMaker.makeOutputModel(model: self.model) else { return }
+                guard let outputModel = outputModelMaker.makeOutputModel(model: self.model) else {
+                    self.view.process(event: .dataValidationFailed("Wrong adress or data type not specified. Possible Types: \'Int\',\'String\',\'JSON-array\',\'JSON-object\'"))
+                    return
+            }
                     worker?.performRequestWith(model: outputModel, completion: { result in
                         self.presenter?.processReceivedDataAndPresentIt(result)
                     })
-               
-                
             case .failure(let error):
                 view.process(event: .dataValidationFailed(error))
             }
@@ -94,6 +91,5 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
             view.process(event: .adressValidationFailed)
         }
     }
-    
     
 }

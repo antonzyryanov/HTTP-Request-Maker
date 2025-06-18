@@ -10,14 +10,16 @@ import UIKit
 
 class RequestMakerVCTabBarPresenter {
     
-    weak var viewController: RequestMakerViewController?
+    private weak var viewController: RequestMakerViewController?
     
-    init(viewController: RequestMakerViewController? = nil) {
+    private let delayToShowButtonAnimation: Double = 0.35
+    
+    init(viewController: RequestMakerViewController? = nil, executeButtonTapAction: (()->Void)?) {
         self.viewController = viewController
-        setupTabBar()
+        setupTabBar(executeButtonTapAction: executeButtonTapAction)
     }
     
-    private func setupTabBar() {
+    private func setupTabBar(executeButtonTapAction: (()->Void)?) {
         viewController?.tabBar.customizeWith(configuration: CustomTabBarConfiguration(backgroundColor: .white, borderColor: UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1),
                                                                       buttonsColor: .white,borderWidth: 2, cornerRadius: 16, buttonsCornerRadius: 12,
             buttons: [
@@ -26,7 +28,9 @@ class RequestMakerVCTabBarPresenter {
             CustomTabBarButtonModel(title: "", image: UIImage(named: ""), action: {
             }),
             CustomTabBarButtonModel(title: "Send Request", image: UIImage(named: "send_request"), action: {
-                self.viewController?.viewModel?.process(event: .executeButtonTapped)
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.delayToShowButtonAnimation) {
+                    executeButtonTapAction?()
+                }
             })
             ]
             )

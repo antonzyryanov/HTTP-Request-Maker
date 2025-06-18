@@ -34,7 +34,7 @@ class LoaderPresenter {
         DispatchQueue.main.async {
             self.viewController?.view.isUserInteractionEnabled = false
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+        DispatchQueue.main.async {
             self.loaderView.isHidden = false
             self.viewController?.view.layoutSubviews()
         }

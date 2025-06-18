@@ -36,7 +36,9 @@ class RequestMakerViewController: VCWithCustomTabBar {
     }
     
     private func createTabBarPresenter() {
-        self.tabBarPresenter = RequestMakerVCTabBarPresenter(viewController: self)
+        self.tabBarPresenter = RequestMakerVCTabBarPresenter(viewController: self, executeButtonTapAction: {
+            self.viewModel?.process(event: .executeButtonTapped)
+        })
     }
     
     private func createLoaderPresenter() {
@@ -54,7 +56,8 @@ class RequestMakerViewController: VCWithCustomTabBar {
 }
 
 extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
-    private func validationSucceded() {
+    private func handleValidationSuccess() {
+        self.loaderPresenter?.hideLoader()
         self.viewsContainer.responseErrorLabel.text = "Error: -"
         self.viewsContainer.responseErrorLabel.textColor = .black
         self.viewsContainer.serverAddressTextField.textColor = .black
@@ -71,13 +74,13 @@ extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
         case .adressValidationFailed:
             handleAddressValidationFailureEvent()
         case .adressValidationSucceded:
-            self.validationSucceded()
+            self.handleValidationSuccess()
         case .dataValidationFailed(let error):
             self.loaderPresenter?.hideLoader()
             self.viewsContainer.responseErrorLabel.text = "Error: \(error)"
             self.viewsContainer.responseErrorLabel.textColor = .red
         case .dataValidationSucceded:
-            self.validationSucceded()
+            self.handleValidationSuccess()
         }
     }
     
@@ -114,7 +117,7 @@ extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
         }
     }
     
-    fileprivate func handleAddressValidationFailureEvent() {
+    private func handleAddressValidationFailureEvent() {
         self.loaderPresenter?.hideLoader()
         self.viewsContainer.responseErrorLabel.text = "Error: Validation Error\nWrong server adress format"
         self.viewsContainer.responseErrorLabel.textColor = .red

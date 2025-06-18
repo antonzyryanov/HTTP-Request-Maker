@@ -9,6 +9,10 @@ import Foundation
 
 class RequestMakerValidator {
     func urlValidated(urlString: String?) -> Bool {
+        if urlString == nil { return false }
+        if let url = urlString, url == "" {
+            return false
+        }
         let urlRegEx = "((\\w)*|([0-9]*)|([-|_])*)+([\\.|/]((\\w)*|([0-9]*)|([-|_])*))+"
         return NSPredicate(format: "SELF MATCHES %@", urlRegEx).evaluate(with: urlString)
     }
