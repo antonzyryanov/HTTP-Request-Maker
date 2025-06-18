@@ -10,10 +10,10 @@ import SnapKit
 
 class CustomTabBarButton: UIView {
     
-    var titleLabel: UILabel?
-    var imageView: UIImageView?
+    private var titleLabel: UILabel?
+    private var imageView: UIImageView?
     var backgroundView: UIView?
-    var tapAction: (()->Void)?
+    private var tapAction: (()->Void)?
     var navigateToScreen: ((String)->Void)? = nil
     
     private let highlightColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)

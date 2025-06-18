@@ -41,6 +41,7 @@ class RequestMakerVCViewModelEventsUIHandler {
     func handleRequestFailureEvent(_ response: ServerResponsePresentationModel) {
         self.viewsContainer?.responseErrorLabel.text = "Error: \(response.message)"
         self.viewsContainer?.responseStatusLabel.text = "Status: \(response.status)"
+        self.viewsContainer?.responseLabel.text = "Response: \(response.responseData)"
         self.viewsContainer?.serverResponseLabel.textColor = .red
         self.viewsContainer?.responseLabel.textColor = .red
         self.viewsContainer?.responseErrorLabel.textColor = .red

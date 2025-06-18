@@ -9,9 +9,9 @@ import UIKit
 
 class CustomTabBar: UIView {
     
-    var buttonsViews: [CustomTabBarButton] = []
+    private var buttonsViews: [CustomTabBarButton] = []
     
-    var navigateToScreen: ((String)->Void)? = nil
+    private var navigateToScreen: ((String)->Void)? = nil
     
     init() {
         super.init(frame: .zero)

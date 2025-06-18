@@ -9,10 +9,10 @@ import UIKit
 
 class CustomSwitch: UIView {
 
-    var titleLabel: TopAlignedLabel = TopAlignedLabel()
-    var switchView: UISwitch = UISwitch()
+    private var titleLabel: TopAlignedLabel = TopAlignedLabel()
+    private var switchView: UISwitch = UISwitch()
     var delegate: CustomSwitchDelegate?
-    var changedOption: CustomSwitchOption = .isConnectionSecure
+    private var changedOption: CustomSwitchOption = .isConnectionSecure
     
     private let switchColor = UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1)
     
@@ -24,6 +24,12 @@ class CustomSwitch: UIView {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+    }
+    
+    func configureWith(title: String,andChangedOption changedOption: CustomSwitchOption) {
+        self.setupTitleLabel(title)
+        self.setupSwitch()
+        self.changedOption = changedOption
     }
     
     private func setupTitleLabel(_ title: String) {
@@ -48,12 +54,6 @@ class CustomSwitch: UIView {
         }
         switchView.onTintColor = switchColor
         switchView.addTarget(self, action: #selector(onSwitchValueChanged), for: .valueChanged)
-    }
-    
-    func configureWith(title: String,andChangedOption changedOption: CustomSwitchOption) {
-        self.setupTitleLabel(title)
-        self.setupSwitch()
-        self.changedOption = changedOption
     }
     
     @objc private func onSwitchValueChanged(_ switchView: UISwitch) {

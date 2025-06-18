@@ -9,8 +9,8 @@ import Foundation
 
 class DictionaryEditorItemViewModel {
     
-    var view: DictionaryEditorItemView
-    var model: DictionaryEditorItemModel
+    private var view: DictionaryEditorItemView
+    private var model: DictionaryEditorItemModel
     
     init(view: DictionaryEditorItemView, model: DictionaryEditorItemModel) {
         self.view = view

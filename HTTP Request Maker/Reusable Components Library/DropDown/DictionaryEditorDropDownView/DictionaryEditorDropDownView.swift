@@ -21,7 +21,7 @@ class DictionaryEditorDropDownView: UIView, DropDownProtocol {
     let vStackBottomSpacer = UIView()
     
     
-    var model: DictionaryEditorModel?
+    private var model: DictionaryEditorModel?
     
     var delegate: DictionaryEditorDropDownViewDelegate?
     

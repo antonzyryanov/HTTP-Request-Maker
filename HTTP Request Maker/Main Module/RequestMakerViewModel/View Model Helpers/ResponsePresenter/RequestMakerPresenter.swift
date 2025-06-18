@@ -54,7 +54,17 @@ class RequestMakerResponsePresenter {
                     return
                 }
             }
-            self.view?.process(event: .requestFailed(.init(status: "-", message: "Request Failed", responseData: "-")))
+            do {
+                let isConnectedToNetwork = try Reachability().isConnectedToNetwork
+                if isConnectedToNetwork {
+                    self.view?.process(event: .requestFailed(.init(status: "-", message: "Request Failed", responseData: "\(error.localizedDescription)")))
+                } else {
+                    self.view?.process(event: .requestFailed(.init(status: "-", message: "Request Failed", responseData: "There is no internet connection on your device")))
+                }
+            } catch {
+                self.view?.process(event: .requestFailed(.init(status: "-", message: "Request Failed", responseData: "\(error.localizedDescription)")))
+            }
+            
         }
     }
     

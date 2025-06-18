@@ -17,7 +17,7 @@ class RequestMakerViewController: VCWithCustomTabBar {
     private var loaderPresenter: LoaderPresenter?
     private var tabBarPresenter: RequestMakerVCTabBarPresenter?
     private var viewModelsEventsUIHandler: RequestMakerVCViewModelEventsUIHandler?
-    private var customDelegatesHandler: RequestMakerVCCustomDelegatesHandler?
+    private var customUIComponentsDelegatesHandler: RequestMakerVCCustomDelegatesHandler?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +53,7 @@ class RequestMakerViewController: VCWithCustomTabBar {
     }
     
     private func createCustomDelegatesHandler() {
-        customDelegatesHandler = RequestMakerVCCustomDelegatesHandler(viewModel: self.viewModel)
+        customUIComponentsDelegatesHandler = RequestMakerVCCustomDelegatesHandler(viewModel: self.viewModel)
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
@@ -116,12 +116,12 @@ extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
 
 extension RequestMakerViewController: CustomSwitchDelegate {
     func handleToggleOf(key: CustomSwitchOption, value: Bool) {
-        customDelegatesHandler?.handleToggleOf(key: key, value: value)
+        customUIComponentsDelegatesHandler?.handleToggleOf(key: key, value: value)
     }
 }
 
 extension RequestMakerViewController: DictionaryEditorDropDownViewDelegate {
     func handeUpdateOf(dictionary: [String : String], dictType: CustomDictionaryOption) {
-        customDelegatesHandler?.handeUpdateOf(dictionary: dictionary, dictType: dictType)
+        customUIComponentsDelegatesHandler?.handeUpdateOf(dictionary: dictionary, dictType: dictType)
     }
 }

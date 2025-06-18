@@ -9,9 +9,9 @@ import UIKit
 
 class DictionaryEditorItemView: UIView {
 
-    let keyTextView = UITextView()
-    let valueTextView = UITextView()
-    let horizontalStack = UIStackView()
+    private let keyTextView = UITextView()
+    private let valueTextView = UITextView()
+    private let horizontalStack = UIStackView()
     var index: Int = 0
     
     var delegate: DictionaryEditorItemViewDelegate?
