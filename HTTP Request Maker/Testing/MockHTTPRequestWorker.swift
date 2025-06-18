@@ -81,7 +81,34 @@ class MockHTTPRequestWorker: NSObject, HTTPRequestWorkerProtocol {
     }
     
     private func generateRandomFakeResponse(completion: @escaping (Result<Data, Error>) -> Void) {
-        let randomMockIndex = Int.random(in: 1..<11)
+        
+        if appTestModeSettings?.mockRequestCanFail ?? false {
+            let isRequestFailed = Bool.random()
+            if isRequestFailed {
+                let badResponsesStatusCodes = HTTPStatusCode.allCases.filter { statusCode in
+                    (399<statusCode.rawValue) && (600>statusCode.rawValue)
+                }
+                guard let randomResponseStatusCode = badResponsesStatusCodes.randomElement() else { return }
+                guard let randomHTTPStatusCode = HTTPStatusCode.allCases.randomElement() else { return }
+                completion(.failure(NSError(domain: "Response error", code: randomResponseStatusCode.rawValue)))
+                return
+            }
+        }
+        
+        var usedMockServerResponsesJSONSIndexesRange: Range<Int> = 1..<11
+        
+        switch appTestModeSettings?.mockSuccessfullServerResponsesConfiguration {
+        case .suitableForTheClient:
+            usedMockServerResponsesJSONSIndexesRange = 1..<11
+        case .notSuitableForTheClient:
+            usedMockServerResponsesJSONSIndexesRange = 11..<16
+        case .bothSuitableAndNotSuitableForTheClient:
+            usedMockServerResponsesJSONSIndexesRange = 1..<16
+        case nil:
+            usedMockServerResponsesJSONSIndexesRange = 1..<11
+        }
+        
+        let randomMockIndex = Int.random(in: usedMockServerResponsesJSONSIndexesRange)
         if let path = Bundle.main.path(forResource: "ResponseMock\(randomMockIndex)", ofType: "json")
         {
             do {

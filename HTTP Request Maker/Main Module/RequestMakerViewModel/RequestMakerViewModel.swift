@@ -16,11 +16,13 @@ class RequestMakerViewModel {
     
     private var validator = RequestMakerValidator()
     private let outputModelMaker = OutputModelMaker()
+    private let presenter: RequestMakerPresenter?
     
     init(view: RequestMakerViewModelToViewProtocol, model: RequestModelProtocol, worker: HTTPRequestWorkerProtocol?) {
         self.view = view
         self.model = model
         self.worker = worker
+        self.presenter = RequestMakerPresenter(view: view)
     }
     
 }
@@ -81,39 +83,7 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
             case .success(let dataType):
                 guard let outputModel = outputModelMaker.makeOutputModel(model: self.model) else { return }
                     worker?.performRequestWith(model: outputModel, completion: { result in
-                        switch result {
-                        case .success(let data):
-                            do {
-                                let serverResponseModel = try JSONDecoder().decode(ServerResponseModel.self, from: data)
-                                if let dataValue = serverResponseModel.data {
-                                    switch dataValue {
-                                    case .null:
-                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: "")))
-                                    case .string(let stringData):
-                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: stringData)))
-                                    case .int(let intData):
-                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: String(intData))))
-                                    case .jsonArray(let jsonArray):
-                                        var values: [Any] = []
-                                        for item in jsonArray {
-                                            values.append(item.value)
-                                        }
-                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: "\(values)")))
-                                    case .jsonObject(let json):
-                                        var values: [String:Any] = [:]
-                                        for item in json {
-                                            values[item.key] = item.value
-                                        }
-                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: "\(values)")))
-                                    }
-                                }
-                            } catch {
-                                self.view.process(event: .requestFailed("Request failed"))
-                            }
-                            
-                        case .failure(let error):
-                            self.view.process(event: .requestFailed(error.localizedDescription))
-                        }
+                        self.presenter?.processReceivedDataAndPresentIt(result)
                     })
                
                 

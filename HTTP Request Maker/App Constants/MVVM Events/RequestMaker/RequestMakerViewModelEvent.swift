@@ -10,7 +10,7 @@ import Foundation
 enum RequestMakerViewModelEvent{
     case makingRequest
     case requestSuccessed(ServerResponsePresentationModel)
-    case requestFailed(String)
+    case requestFailed(ServerResponsePresentationModel)
     case adressValidationSucceded
     case adressValidationFailed
     case dataValidationFailed(String)

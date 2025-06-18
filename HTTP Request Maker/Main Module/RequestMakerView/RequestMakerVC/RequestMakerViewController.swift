@@ -66,8 +66,8 @@ extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
             self.loaderPresenter?.showLoader()
         case .requestSuccessed(let serverResponse):
             handleRequestSuccessEvent(serverResponse)
-        case .requestFailed(let error):
-            handleRequestFailureEvent(error)
+        case .requestFailed(let response):
+            handleRequestFailureEvent(response)
         case .adressValidationFailed:
             handleAddressValidationFailureEvent()
         case .adressValidationSucceded:
@@ -98,10 +98,10 @@ extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
         }
     }
     
-    private func handleRequestFailureEvent(_ error: (String)) {
+    private func handleRequestFailureEvent(_ response: ServerResponsePresentationModel) {
         self.loaderPresenter?.hideLoader()
-        self.viewsContainer.responseErrorLabel.text = "Error: \(error)"
-        self.viewsContainer.responseStatusLabel.text = "Status: "
+        self.viewsContainer.responseErrorLabel.text = "Error: \(response.message)"
+        self.viewsContainer.responseStatusLabel.text = "Status: \(response.status)"
         self.viewsContainer.serverResponseLabel.textColor = .red
         self.viewsContainer.responseLabel.textColor = .red
         self.viewsContainer.responseErrorLabel.textColor = .red

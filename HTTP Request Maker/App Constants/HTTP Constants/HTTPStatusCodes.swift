@@ -5,7 +5,7 @@
 //  Created by Anton Zyryanov on 16.06.2025.
 //
 
-enum HTTPStatusCode: Int, Error {
+enum HTTPStatusCode: Int, Error, CaseIterable {
     
     enum ResponseType {
         case informational
