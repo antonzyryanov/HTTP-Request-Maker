@@ -7,7 +7,7 @@
 
 import Foundation
 
-class HTTPRequestNetworkWorker: NSObject, HTTPRequestWorkerProtocol {
+class HTTPRequestNetworkWorker: HTTPRequestWorkerProtocol {
     
     func performRequestWith(model: RequestOutputModelProtocol, completion: @escaping (Result<Data, Error>) -> Void) {
         let scheme = model.isConnectionSecure ? "https" : "http"
@@ -53,7 +53,7 @@ class HTTPRequestNetworkWorker: NSObject, HTTPRequestWorkerProtocol {
     
     private func createURLSession(model: RequestOutputModelProtocol,sessionConfig: URLSessionConfiguration) -> URLSession {
         if !model.isSecurityValidationOn {
-            return URLSession(configuration: sessionConfig,delegate: self, delegateQueue: nil)
+            return URLSession(configuration: sessionConfig,delegate: IgnoringCerificatesURLSessionDelegate(), delegateQueue: nil)
         } else {
             return URLSession(configuration: sessionConfig)
         }
@@ -86,9 +86,9 @@ class HTTPRequestNetworkWorker: NSObject, HTTPRequestWorkerProtocol {
 }
 
 
-extension HTTPRequestNetworkWorker: URLSessionDelegate {
+class IgnoringCerificatesURLSessionDelegate: NSObject, URLSessionDelegate {
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        // обработка ошибки валидации защищенного соединения - реализовано игнорирование проверки сертификата при isSecurityValidationOn = false
+        // обработка ошибки валидации защищенного соединения - реализовано игнорирование проверки сертификата при параметре модели запроса isSecurityValidationOn = false
         completionHandler(Foundation.URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
     }
 }
