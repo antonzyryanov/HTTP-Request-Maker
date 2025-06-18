@@ -13,7 +13,6 @@ class RequestMakerViewController: VCWithCustomTabBar {
     var viewModel: RequestMakerViewToViewModelProtocol?
     
     private let viewsContainer = RequestMakerViewsContainer()
-    
     private var uiBuilder: RequestMakerVCUIBuilder?
     private var loaderPresenter: LoaderPresenter?
     private var tabBarPresenter: RequestMakerVCTabBarPresenter?

@@ -33,8 +33,6 @@ class LoaderPresenter {
     func showLoader() {
         DispatchQueue.main.async {
             self.viewController?.view.isUserInteractionEnabled = false
-        }
-        DispatchQueue.main.async {
             self.loaderView.isHidden = false
             self.viewController?.view.layoutSubviews()
         }

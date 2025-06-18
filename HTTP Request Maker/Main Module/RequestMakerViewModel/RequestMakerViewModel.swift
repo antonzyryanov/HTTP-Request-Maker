@@ -61,17 +61,18 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
     
     private func processHTTPDataChange(_ dict: ([String : String])) {
         let validationResult = validator.validate(dict["data"] ?? "", as: dict["data type"] ?? "")
+        
         switch validationResult {
         case .success(let dataType):
             self.model.customData = (dataType,dict["data"] ?? "")
             view.process(event: .dataValidationSucceded)
         case .failure(let error):
+            self.model.customData = (.Int,"Error")
             view.process(event: .dataValidationFailed(error))
         }
     }
     
     private func processExecuteButtonTapped() {
-        view.process(event: .makingRequest)
         if validator.urlValidated(urlString: model.serverAdress) {
             view.process(event: .adressValidationSucceded)
             let validationResult = validator.validate(model.customData.1, as: model.customData.0.rawValue)
@@ -80,10 +81,11 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
                 guard let outputModel = outputModelMaker.makeOutputModel(model: self.model) else {
                     self.view.process(event: .dataValidationFailed("Wrong adress or data type not specified. Possible Types: \'Int\',\'String\',\'JSON-array\',\'JSON-object\'"))
                     return
-            }
-                    worker?.performRequestWith(model: outputModel, completion: { result in
+                }
+                view.process(event: .makingRequest)
+                worker?.performRequestWith(model: outputModel, completion: { result in
                         self.presenter?.processReceivedDataAndPresentIt(result)
-                    })
+                })
             case .failure(let error):
                 view.process(event: .dataValidationFailed(error))
             }
