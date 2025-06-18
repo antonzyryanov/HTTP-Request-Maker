@@ -15,46 +15,12 @@ class RequestMakerViewModel {
     private var worker: HTTPRequestWorkerProtocol?
     
     private var validator = RequestMakerValidator()
+    private let outputModelMaker = OutputModelMaker()
     
     init(view: RequestMakerViewModelToViewProtocol, model: RequestModelProtocol, worker: HTTPRequestWorkerProtocol?) {
         self.view = view
         self.model = model
         self.worker = worker
-    }
-    
-    private func makeOutputModel() -> RequestOutputModelProtocol? {
-        switch model.customData.0 {
-        case .Null:
-            return RequestOutputModel(methodType: model.methodType, serverAdress: model.serverAdress, isConnectionSecure: model.isConnectionSecure, isSecurityValidationOn: model.isSecurityValidationOn, customHeaders: model.customHeaders, customData: nil, action: model.action)
-        case .String:
-            return RequestOutputModel(methodType: model.methodType, serverAdress: model.serverAdress, isConnectionSecure: model.isConnectionSecure, isSecurityValidationOn: model.isSecurityValidationOn, customHeaders: model.customHeaders, customData: model.customData.1, action: model.action)
-        case .Int:
-            let intCustomData = Int(model.customData.1)
-            return RequestOutputModel(methodType: model.methodType, serverAdress: model.serverAdress, isConnectionSecure: model.isConnectionSecure, isSecurityValidationOn: model.isSecurityValidationOn, customHeaders: model.customHeaders, customData: intCustomData as Any, action: model.action)
-        case .JSON:
-            let stringData = model.customData.1
-            if let data = stringData.data(using: .utf8) {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        return RequestOutputModel(methodType: model.methodType, serverAdress: model.serverAdress, isConnectionSecure: model.isConnectionSecure, isSecurityValidationOn: model.isSecurityValidationOn, customHeaders: model.customHeaders, customData: json, action: model.action)
-                    }
-                } catch {
-                    return nil
-                }
-            }
-        case .JSONArray:
-            let stringData = model.customData.1
-            if let data = stringData.data(using: .utf8) {
-                do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] {
-                        return RequestOutputModel(methodType: model.methodType, serverAdress: model.serverAdress, isConnectionSecure: model.isConnectionSecure, isSecurityValidationOn: model.isSecurityValidationOn, customHeaders: model.customHeaders, customData: json, action: model.action)
-                    }
-                } catch {
-                    return nil
-                }
-            }
-        }
-        return nil
     }
     
 }
@@ -113,7 +79,7 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
             let validationResult = validator.validate(model.customData.1, as: model.customData.0.rawValue)
             switch validationResult {
             case .success(let dataType):
-                guard let outputModel = makeOutputModel() else { return }
+                guard let outputModel = outputModelMaker.makeOutputModel(model: self.model) else { return }
                     worker?.performRequestWith(model: outputModel, completion: { result in
                         switch result {
                         case .success(let data):
@@ -128,9 +94,17 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
                                     case .int(let intData):
                                         self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: String(intData))))
                                     case .jsonArray(let jsonArray):
-                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: "\(jsonArray)")))
+                                        var values: [Any] = []
+                                        for item in jsonArray {
+                                            values.append(item.value)
+                                        }
+                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: "\(values)")))
                                     case .jsonObject(let json):
-                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: "\(json)")))
+                                        var values: [String:Any] = [:]
+                                        for item in json {
+                                            values[item.key] = item.value
+                                        }
+                                        self.view.process(event: .requestSuccessed(.init(status: String(serverResponseModel.status), message: serverResponseModel.message ?? "", responseData: "\(values)")))
                                     }
                                 }
                             } catch {

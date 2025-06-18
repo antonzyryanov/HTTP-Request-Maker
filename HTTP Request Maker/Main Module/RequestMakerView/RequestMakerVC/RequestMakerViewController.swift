@@ -16,6 +16,7 @@ class RequestMakerViewController: VCWithCustomTabBar {
     
     private var uiBuilder: RequestMakerVCUIBuilder?
     private var loaderPresenter: LoaderPresenter?
+    private var tabBarPresenter: RequestMakerVCTabBarPresenter?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +27,7 @@ class RequestMakerViewController: VCWithCustomTabBar {
         createBuilder()
         uiBuilder?.build()
         super.viewWillAppear(animated)
-        setupTabBar()
+        createTabBarPresenter()
         createLoaderPresenter()
     }
     
@@ -34,24 +35,12 @@ class RequestMakerViewController: VCWithCustomTabBar {
         uiBuilder = RequestMakerVCUIBuilder(viewController: self, viewsContainer: viewsContainer)
     }
     
-    private func createLoaderPresenter() {
-        loaderPresenter = LoaderPresenter(viewController: self)
+    private func createTabBarPresenter() {
+        self.tabBarPresenter = RequestMakerVCTabBarPresenter(viewController: self)
     }
     
-    private func setupTabBar() {
-        tabBar.customizeWith(configuration: CustomTabBarConfiguration(backgroundColor: .white, borderColor: UIColor.init(red: 181/255, green: 224/255, blue: 140/255, alpha: 1),
-                                                                      buttonsColor: .white,borderWidth: 2, cornerRadius: 16, buttonsCornerRadius: 12,
-            buttons: [
-            CustomTabBarButtonModel(title: "", image: UIImage(named: ""), action: {
-            }),
-            CustomTabBarButtonModel(title: "", image: UIImage(named: ""), action: {
-            }),
-            CustomTabBarButtonModel(title: "Send Request", image: UIImage(named: "send_request"), action: {
-                self.viewModel?.process(event: .executeButtonTapped)
-            })
-            ]
-            )
-        )
+    private func createLoaderPresenter() {
+        loaderPresenter = LoaderPresenter(viewController: self)
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
