@@ -12,8 +12,8 @@ class RequestMakerViewModel {
     
     private var view: RequestMakerViewModelToViewProtocol
     private var model: RequestModelProtocol
-    private var worker: HTTPRequestWorkerProtocol?
     
+    private var networkWorker: HTTPRequestWorkerProtocol?
     private var validator = RequestMakerValidator()
     private let outputModelMaker = OutputModelMaker()
     private let presenter: RequestMakerPresenter?
@@ -21,7 +21,7 @@ class RequestMakerViewModel {
     init(view: RequestMakerViewModelToViewProtocol, model: RequestModelProtocol, worker: HTTPRequestWorkerProtocol?) {
         self.view = view
         self.model = model
-        self.worker = worker
+        self.networkWorker = worker
         self.presenter = RequestMakerPresenter(view: view)
     }
     
@@ -50,9 +50,9 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
         }
     }
     
-    private func processChangeOf(_ adress: (String)) {
-        model.serverAdress = adress
-        if validator.urlValidated(urlString: adress) {
+    private func processChangeOf(_ address: (String)) {
+        model.serverAdress = address
+        if validator.urlValidated(urlString: address) {
             view.process(event: .adressValidationSucceded)
         } else {
             view.process(event: .adressValidationFailed)
@@ -83,7 +83,7 @@ extension RequestMakerViewModel: RequestMakerViewToViewModelProtocol {
                     return
                 }
                 view.process(event: .makingRequest)
-                worker?.performRequestWith(model: outputModel, completion: { result in
+                networkWorker?.performRequestWith(model: outputModel, completion: { result in
                         self.presenter?.processReceivedDataAndPresentIt(result)
                 })
             case .failure(let error):

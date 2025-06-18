@@ -10,9 +10,9 @@ import Foundation
 class AppTestModeSettings {
     var isMockNetworkLayerOn = true
     var mockServerResponseDelayTime: Double = 4.0
-    var mockRequestCanFail = true
+    var mockRequestCanFail = false
     var mockSuccessfullServerResponsesConfiguration: MockSuccessfullServerResponsesConfiguration =
-        .bothSuitableAndNotSuitableForTheClient
+        .notSuitableForTheClient
 }
 
 enum MockSuccessfullServerResponsesConfiguration {

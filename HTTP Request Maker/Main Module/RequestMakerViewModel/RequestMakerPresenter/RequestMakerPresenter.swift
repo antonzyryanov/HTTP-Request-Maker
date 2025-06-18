@@ -43,7 +43,8 @@ class RequestMakerPresenter {
                     }
                 }
             } catch {
-                self.view?.process(event: .requestSuccessed(.init(status: "", message: "Server responed", responseData: "The server responded but returned data in a format inappropriate for the client")))
+                let str = String(decoding: data, as: UTF8.self)
+                self.view?.process(event: .requestSuccessed(.init(status: "", message: "The server responded but returned data in a format inappropriate for the client", responseData: "\(str)")))
             }
             
         case .failure(let error):
