@@ -16,7 +16,8 @@ class RequestMakerViewController: VCWithCustomTabBar {
     private var uiBuilder: RequestMakerVCUIBuilder?
     private var loaderPresenter: LoaderPresenter?
     private var tabBarPresenter: RequestMakerVCTabBarPresenter?
-    private var requestMakerVCViewModelEventsUIHandler: RequestMakerVCViewModelEventsUIHandler?
+    private var viewModelsEventsUIHandler: RequestMakerVCViewModelEventsUIHandler?
+    private var customDelegatesHandler: RequestMakerVCCustomDelegatesHandler?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +31,7 @@ class RequestMakerViewController: VCWithCustomTabBar {
         createTabBarPresenter()
         createLoaderPresenter()
         createViewModelEventsUIHandler()
+        createCustomDelegatesHandler()
     }
     
     private func createBuilder() {
@@ -47,7 +49,11 @@ class RequestMakerViewController: VCWithCustomTabBar {
     }
     
     private func createViewModelEventsUIHandler() {
-        requestMakerVCViewModelEventsUIHandler = RequestMakerVCViewModelEventsUIHandler(viewsContainer: self.viewsContainer)
+        viewModelsEventsUIHandler = RequestMakerVCViewModelEventsUIHandler(viewsContainer: self.viewsContainer)
+    }
+    
+    private func createCustomDelegatesHandler() {
+        customDelegatesHandler = RequestMakerVCCustomDelegatesHandler(viewModel: self.viewModel)
     }
     
     @objc func textFieldDidChange(_ textField: UITextField) {
@@ -84,50 +90,38 @@ extension RequestMakerViewController : RequestMakerViewModelToViewProtocol {
     
     private func handleRequestSuccessEvent(_ serverResponse: (ServerResponsePresentationModel)) {
         self.loaderPresenter?.hideLoader()
-        requestMakerVCViewModelEventsUIHandler?.handleRequestFailureEvent(serverResponse)
+        viewModelsEventsUIHandler?.handleRequestFailureEvent(serverResponse)
     }
     
     private func handleRequestFailureEvent(_ response: ServerResponsePresentationModel) {
         self.loaderPresenter?.hideLoader()
-        requestMakerVCViewModelEventsUIHandler?.handleRequestFailureEvent(response)
+        viewModelsEventsUIHandler?.handleRequestFailureEvent(response)
     }
     
     private func handleAddressValidationFailureEvent() {
         self.loaderPresenter?.hideLoader()
-        requestMakerVCViewModelEventsUIHandler?.handleAddressValidationFailureEvent()
+        viewModelsEventsUIHandler?.handleAddressValidationFailureEvent()
     }
     
     private func handleValidationSuccess() {
         self.loaderPresenter?.hideLoader()
-        requestMakerVCViewModelEventsUIHandler?.handleValidationSuccess()
+        viewModelsEventsUIHandler?.handleValidationSuccess()
     }
     
     private func handleDataValidationFailure(_ error: (String)) {
-        requestMakerVCViewModelEventsUIHandler?.handleDataValidationFailure(error)
+        viewModelsEventsUIHandler?.handleDataValidationFailure(error)
     }
     
 }
 
 extension RequestMakerViewController: CustomSwitchDelegate {
     func handleToggleOf(key: CustomSwitchOption, value: Bool) {
-        switch key {
-        case .isConnectionSecure:
-            viewModel?.process(event: .securitySettingsChanged(value))
-        case .isSecurityValidationOn:
-            viewModel?.process(event: .validationSettingsChanged(value))
-        }
+        customDelegatesHandler?.handleToggleOf(key: key, value: value)
     }
 }
 
 extension RequestMakerViewController: DictionaryEditorDropDownViewDelegate {
-    
     func handeUpdateOf(dictionary: [String : String], dictType: CustomDictionaryOption) {
-        switch dictType {
-        case .httpHeaders:
-            viewModel?.process(event: .httpHeadersChanged(dictionary))
-        case .httpData:
-            viewModel?.process(event: .httpDataChanged(dictionary))
-        }
+        customDelegatesHandler?.handeUpdateOf(dictionary: dictionary, dictType: dictType)
     }
-    
 }

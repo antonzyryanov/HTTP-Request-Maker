@@ -60,8 +60,8 @@ class RequestMakerVCViewModelEventsUIHandler {
     }
     
     func handleDataValidationFailure(_ error: (String)) {
-        self.viewsContainer.responseErrorLabel.text = "Error: \(error)"
-        self.viewsContainer.responseErrorLabel.textColor = .red
+        self.viewsContainer?.responseErrorLabel.text = "Error: \(error)"
+        self.viewsContainer?.responseErrorLabel.textColor = .red
     }
     
 }
